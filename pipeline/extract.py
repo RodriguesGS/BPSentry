@@ -82,5 +82,5 @@ class Extract:
         self.save_data(df)
         self.cleanup()
 
-        log.info('Extração Completa!\n')
+        log.info('Extração Completa!')
         return df

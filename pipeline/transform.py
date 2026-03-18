@@ -55,7 +55,7 @@ class Transform:
         log.info(f'{len(df_new)} empresas novas foram salvas')
 
 
-    def save_snapshot(self, df: pd.DataFrame):
+    def save_snapshot(self, df: pd.DataFrame) -> bool:
 
         existing = pd.read_sql(
             'SELECT "Handle PubliBackup", data_ingestao FROM silver.tb_snapshot',
@@ -67,7 +67,7 @@ class Transform:
 
         if df_new.empty:
             log.info('Ingestão do dia já foi feita')
-            return
+            return False
 
         df_new.to_sql(
             name='tb_snapshot',
@@ -78,15 +78,19 @@ class Transform:
             chunksize=500,
         )
         log.info(f'{len(df_new)} registros foram salvos')
+        return True
 
-    def process(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    def process(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame] | tuple[pd.DataFrame, None] :
          
         log.info('Iniciando Transform...')
         df = self.filter_data(df)
         df_companies, df_snapshot = self.build_tb(df)
 
         self.save_companies(df_companies)
-        self.save_snapshot(df_snapshot)
+        
+        insert = self.save_snapshot(df_snapshot)
+        if insert is None:
+            return df_companies, None
 
         log.info('Transform Completo!')
 

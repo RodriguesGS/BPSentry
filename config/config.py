@@ -35,6 +35,19 @@ SNAPSHOT_COLUMNS = [
     'data_ingestao',
 ]
 
+ANALYTICAL_COLUMNS = [
+    'Handle PubliBackup',
+    'Nome Fantasia',
+    'Telefone',
+    'Possui Backup',
+    'Licença Ativa',
+    'Último Backup',
+    'Tempo Sem Backup',
+    'Qtd. Total Arquivos',
+    'Status Empresa',
+    'data_ingestao',
+]
+
 def get_logger(name: str):
 
     logging.basicConfig(
