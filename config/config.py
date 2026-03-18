@@ -13,6 +13,27 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST') 
 DB_PORT = os.getenv('DB_PORT')
 
+COMPANIES_COLUMNS = [
+    'Handle PubliBackup',
+    'Nome Fantasia',
+    'Razão Social',
+    'CNPJ',
+    'Telefone',
+    'Telefone2',
+    'Email',
+    'Status Empresa',
+    'Licença Ativa',
+]
+
+SNAPSHOT_COLUMNS = [
+    'Handle PubliBackup',
+    'Possui Backup',
+    'Tempo Sem Backup',
+    'Qtd. Total Arquivos',
+    'Último Backup',
+    'Data/Hora',
+    'data_ingestao',
+]
 
 def get_logger(name: str):
 

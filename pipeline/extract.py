@@ -1,36 +1,23 @@
 import pandas as pd
 import glob
-import sqlalchemy
 import os
 
 from config.config import DATA_RAW_PATH, OUTPUT_PATH, get_logger
-from db.conn import get_engine
 
 log = get_logger(__name__)
 
 class Extract:
     
-    def __init__(self):
-        engine = get_engine()
-        
-        if engine is None:
-            raise RuntimeError('Não foi possivel conectar ao banco.')
-        
-        self.engine: sqlalchemy.Engine = engine
+    def __init__(self, engine):
+        self.engine = engine
         
     
-    def find_data(self):
+    def find_data(self) -> str | None:
         
         file = glob.glob(os.path.join(DATA_RAW_PATH, '*.xls*'))
-
-        try:
-            if len(file) == 0:
-                raise FileNotFoundError("Nenhum arquivo encontrado")
-            
-        except FileNotFoundError as err:
-            log.error(f'Erro: {err}')
+        if len(file) == 0:
             return None
-        
+
         log.info(f'Arquivo encontrado: {file[0]}')
         return file[0]
     
@@ -81,16 +68,19 @@ class Extract:
             os.remove(file)
             
             
-    def process(self) -> pd.DataFrame:
+    def process(self) -> pd.DataFrame | None:
         
         filepath = self.find_data()
-        df       = self.read_data(filepath)
+        
+        if filepath is None:
+            return None
+        
+        df = self.read_data(filepath)
         
         log.info('Salvando dados...')
         self.save_parquet(df)
         self.save_data(df)
         self.cleanup()
 
-        log.info("Extração Completa!\n")
+        log.info('Extração Completa!\n')
         return df
-    
