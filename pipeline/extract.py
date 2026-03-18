@@ -17,6 +17,7 @@ class Extract:
             raise RuntimeError('Não foi possivel conectar ao banco.')
         
         self.engine: sqlalchemy.Engine = engine
+        
     
     def find_data(self):
         
@@ -33,6 +34,7 @@ class Extract:
         log.info(f'Arquivo encontrado: {file[0]}')
         return file[0]
     
+    
     def read_data(self, filepath) -> pd.DataFrame:
 
         df = pd.read_excel(filepath, engine='xlrd')
@@ -43,6 +45,7 @@ class Extract:
         log.info(f'Arquivo lido com sucesso: {df.shape[0]} linhas | {df.shape[1]} colunas')
         
         return df
+    
     
     def save_parquet(self, df: pd.DataFrame):
            
@@ -66,9 +69,18 @@ class Extract:
             chunksize=500,
         )
         
-        log.info('Dados salvos em bronze.tb_raw')
+        log.info('Dados salvos')
         
 
+    def cleanup(self):
+        
+        for file in glob.glob(os.path.join(DATA_RAW_PATH, '*.xls*')):
+            os.remove(file)
+
+        for file in glob.glob(os.path.join(OUTPUT_PATH, '*.parquet')):
+            os.remove(file)
+            
+            
     def process(self) -> pd.DataFrame:
         
         filepath = self.find_data()
@@ -77,6 +89,8 @@ class Extract:
         log.info('Salvando dados...')
         self.save_parquet(df)
         self.save_data(df)
+        self.cleanup()
 
         log.info("Extração Completa!\n")
         return df
+    
